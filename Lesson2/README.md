@@ -1,4 +1,6 @@
-## Практическое задание 1
+## Практическое задание 2
+
+\* - Пункт 5.2 добавил уже после срока сдачи, т.к. посчитал что так будет правильнее.
 
 ### 1. Настроить все VPCS в соответсвии с подсетями для каждого vlan. GW для компьютеров - роутер R1. Пример команды (VPCS> ip 10.10.0.2/24 10.10.0.1)
 ### 2. Порты коммутаторов и роутеров уже имеют  некую преднастройку
@@ -160,7 +162,91 @@ Gi0/3               Altn BLK 20000     128.4    P2p
 
 ### 5. На коммутаторе Switch2 рут портом для инстанса 2 должен быть интерфейс Gi0/2
 
+#### 5.1 Без изменения режима линка между Switch1 и Switch2 на trunk
+
 В процессе выполнения задания 4 так и вышло.
+
+#### 5.2 После изменения режима линка между Switch1 и Switch2 на trunk
+
+<pre>
+<b>VPC4> ping 10.100.0.5</b>
+
+84 bytes from 10.100.0.5 icmp_seq=1 ttl=63 time=48.585 ms
+84 bytes from 10.100.0.5 icmp_seq=2 ttl=63 time=13.536 ms
+84 bytes from 10.100.0.5 icmp_seq=3 ttl=63 time=9.172 ms
+84 bytes from 10.100.0.5 icmp_seq=4 ttl=63 time=12.969 ms
+84 bytes from 10.100.0.5 icmp_seq=5 ttl=63 time=8.286 ms
+</pre>
+
+<pre>
+<b>SW2#sh spanning-tree</b>
+
+
+MST0
+  Spanning tree enabled protocol mstp
+  Root ID    Priority    32768
+             Address     5000.0001.0000
+             Cost        0
+             Port        2 (GigabitEthernet0/1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 0)
+             Address     5000.0002.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Desg FWD 20000     128.1    P2p
+Gi0/1               Root FWD 20000     128.2    P2p
+Gi0/2               Desg FWD 20000     128.3    P2p
+Gi0/3               Desg FWD 20000     128.4    P2p
+Gi1/0               Desg FWD 20000     128.5    P2p
+Gi1/1               Desg FWD 20000     128.6    P2p
+Gi1/2               Desg FWD 20000     128.7    P2p
+Gi1/3               Desg FWD 20000     128.8    P2p
+
+
+
+MST1
+  Spanning tree enabled protocol mstp
+  Root ID    Priority    32769
+             Address     5000.0001.0000
+             Cost        20000
+             Port        2 (GigabitEthernet0/1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     5000.0002.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/0               Desg FWD 20000     128.1    P2p
+Gi0/1               Root FWD 20000     128.2    P2p
+Gi0/2               Desg FWD 20000     128.3    P2p
+Gi0/3               Desg FWD 20000     128.4    P2p
+
+
+
+MST2
+  Spanning tree enabled protocol mstp
+  Root ID    Priority    8194
+             Address     5000.0008.0000
+             Cost        40000
+             Port        3 (GigabitEthernet0/2)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32770  (priority 32768 sys-id-ext 2)
+             Address     5000.0002.0000
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/1               Altn BLK 80000     128.2    P2p
+Gi0/2               Root FWD 20000     128.3    P2p
+Gi0/3               Altn BLK 20000     128.4    P2p
+</pre>
+
 
 ### 6. На роутерах Router1 и Router2 создайте две VRRP группы (для влана 100 и 200). Мастером для обоих групп долежн быть Router1. В качестве VIP используйте IP 10.x.0.254
 
