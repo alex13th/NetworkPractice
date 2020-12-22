@@ -1,6 +1,6 @@
 ## Практическое задание 4
 
-\* - Исправил тип интерфейса на R3 и R4, но не усел исправить отчет.
+\* - Исправил тип интерфейса на R3 и R4 после отправки.
 
 ### Задание:
 
@@ -118,49 +118,47 @@ GigabitEthernet0/0.102 is up, line protocol is up
 #### 1.3 **R3**
 
 <pre>
-show ip ospf int
+R3#show ip ospf int
 GigabitEthernet0/0.101 is up, line protocol is up
   Internet Address 192.168.10.3/28, Area 0, Attached via Network Statement
   Process ID 1, Router ID 3.3.3.3, Network Type BROADCAST, Cost: 1
   Topology-MTID    Cost    Disabled    Shutdown      Topology Name
         0           1         no          no            Base
-  Transmit Delay is 1 sec, State DROTHER, Priority 1
-  Designated Router (ID) 1.1.1.1, Interface address 192.168.10.1
+  Transmit Delay is 1 sec, State DR, Priority 1
+  Designated Router (ID) 3.3.3.3, Interface address 192.168.10.3
   Backup Designated router (ID) 2.2.2.2, Interface address 192.168.10.2
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:07
+    Hello due in 00:00:03
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
   Index 1/1/1, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 0, maximum is 5
-  Last flood scan time is 1 msec, maximum is 2 msec
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 1 msec
   Neighbor Count is 2, Adjacent neighbor count is 2
-    Adjacent with neighbor 1.1.1.1  (Designated Router)
+    Adjacent with neighbor 1.1.1.1
     Adjacent with neighbor 2.2.2.2  (Backup Designated Router)
   Suppress hello for 0 neighbor(s)
 GigabitEthernet0/0.103 is up, line protocol is up
   Internet Address 192.168.20.5/30, Area 1, Attached via Network Statement
-  Process ID 1, Router ID 3.3.3.3, Network Type BROADCAST, Cost: 10
+  Process ID 1, Router ID 3.3.3.3, Network Type POINT_TO_POINT, Cost: 10
   Topology-MTID    Cost    Disabled    Shutdown      Topology Name
         0           10        no          no            Base
-  Transmit Delay is 1 sec, State BDR, Priority 1
-  Designated Router (ID) 4.4.4.4, Interface address 192.168.20.6
-  Backup Designated router (ID) 3.3.3.3, Interface address 192.168.20.5
+  Transmit Delay is 1 sec, State POINT_TO_POINT
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:07
+    Hello due in 00:00:04
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
   Index 1/1/2, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 2, maximum is 2
+  Last flood scan length is 1, maximum is 1
   Last flood scan time is 0 msec, maximum is 1 msec
   Neighbor Count is 1, Adjacent neighbor count is 1
-    Adjacent with neighbor 4.4.4.4  (Designated Router)
+    Adjacent with neighbor 4.4.4.4
   Suppress hello for 0 neighbor(s)
 </pre>
 
@@ -173,9 +171,9 @@ GigabitEthernet0/0.105 is up, line protocol is up
   Process ID 1, Router ID 4.4.4.4, Network Type BROADCAST, Cost: 1
   Topology-MTID    Cost    Disabled    Shutdown      Topology Name
         0           1         no          no            Base
-  Transmit Delay is 1 sec, State BDR, Priority 1
-  Designated Router (ID) 5.5.5.5, Interface address 192.168.30.2
-  Backup Designated router (ID) 4.4.4.4, Interface address 192.168.30.1
+  Transmit Delay is 1 sec, State DR, Priority 1
+  Designated Router (ID) 4.4.4.4, Interface address 192.168.30.1
+  Backup Designated router (ID) 5.5.5.5, Interface address 192.168.30.2
   Timer intervals configured, Hello 5, Dead 20, Wait 20, Retransmit 5
     oob-resync timeout 40
     Hello due in 00:00:00
@@ -184,31 +182,29 @@ GigabitEthernet0/0.105 is up, line protocol is up
   IETF NSF helper support enabled
   Index 1/3/3, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 2, maximum is 3
-  Last flood scan time is 1 msec, maximum is 3 msec
+  Last flood scan length is 0, maximum is 2
+  Last flood scan time is 0 msec, maximum is 2 msec
   Neighbor Count is 1, Adjacent neighbor count is 1
-    Adjacent with neighbor 5.5.5.5  (Designated Router)
+    Adjacent with neighbor 5.5.5.5  (Backup Designated Router)
   Suppress hello for 0 neighbor(s)
 GigabitEthernet0/0.103 is up, line protocol is up
   Internet Address 192.168.20.6/30, Area 1, Attached via Network Statement
-  Process ID 1, Router ID 4.4.4.4, Network Type BROADCAST, Cost: 10
+  Process ID 1, Router ID 4.4.4.4, Network Type POINT_TO_POINT, Cost: 10
   Topology-MTID    Cost    Disabled    Shutdown      Topology Name
         0           10        no          no            Base
-  Transmit Delay is 1 sec, State DR, Priority 1
-  Designated Router (ID) 4.4.4.4, Interface address 192.168.20.6
-  Backup Designated router (ID) 3.3.3.3, Interface address 192.168.20.5
+  Transmit Delay is 1 sec, State POINT_TO_POINT
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:05
+    Hello due in 00:00:07
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
   Index 1/2/2, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 2, maximum is 3
-  Last flood scan time is 0 msec, maximum is 3 msec
+  Last flood scan length is 1, maximum is 2
+  Last flood scan time is 1 msec, maximum is 1 msec
   Neighbor Count is 1, Adjacent neighbor count is 1
-    Adjacent with neighbor 3.3.3.3  (Backup Designated Router)
+    Adjacent with neighbor 3.3.3.3
   Suppress hello for 0 neighbor(s)
 GigabitEthernet0/0.102 is up, line protocol is up
   Internet Address 192.168.20.2/30, Area 1, Attached via Network Statement
@@ -220,14 +216,14 @@ GigabitEthernet0/0.102 is up, line protocol is up
   Backup Designated router (ID) 2.2.2.2, Interface address 192.168.20.1
   Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
     oob-resync timeout 40
-    Hello due in 00:00:03
+    Hello due in 00:00:07
   Supports Link-local Signaling (LLS)
   Cisco NSF helper support enabled
   IETF NSF helper support enabled
   Index 1/1/1, flood queue length 0
   Next 0x0(0)/0x0(0)/0x0(0)
-  Last flood scan length is 2, maximum is 3
-  Last flood scan time is 0 msec, maximum is 3 msec
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 1 msec
   Neighbor Count is 1, Adjacent neighbor count is 1
     Adjacent with neighbor 2.2.2.2  (Backup Designated Router)
   Suppress hello for 0 neighbor(s)
