@@ -73,6 +73,10 @@ router ospf 1
  network 10.3.3.3 0.0.0.0 area 0
  network 10.0.0.8 0.0.0.3 area 1
 !
+router bgp 300
+ bgp log-neighbor-changes
+ neighbor 188.24.0.2 remote-as 700
+!
 
 ip prefix-list pl-AREA1-IN seq 5 deny 10.3.3.3/32
 ip prefix-list pl-AREA1-IN seq 5 permit 10.0.0.0/8 le 32
@@ -115,6 +119,10 @@ router ospf 1
  network 10.0.0.16 0.0.0.3 area 0
  network 10.4.4.4 0.0.0.0 area 0
  network 10.0.0.12 0.0.0.3 area 1
+!
+router bgp 300
+ bgp log-neighbor-changes
+ neighbor 13.201.255.6 remote-as 700
 !
 
 ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
@@ -172,7 +180,10 @@ router ospf 1
  network 172.16.0.4 0.0.0.3 area 0
  network 10.6.6.6 0.0.0.0 area 0
 !
-
+router bgp 700
+ bgp log-neighbor-changes
+ neighbor 188.24.0.1 remote-as 300
+!
 ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
 ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
 ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
@@ -205,6 +216,10 @@ router ospf 1
  network 172.16.0.0 0.0.0.3 area 0
  network 172.16.0.8 0.0.0.3 area 0
  network 10.7.7.7 0.0.0.0 area 0
+!
+router bgp 700
+ bgp log-neighbor-changes
+ neighbor 13.201.255.5 remote-as 300
 !
 
 ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
