@@ -6,11 +6,19 @@ interface Loopback0
 !
 interface GigabitEthernet0/0
  ip address 10.0.0.1 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/1
  ip address 10.0.0.9 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
+
+router ospf 1
+ network 10.0.0.0 0.0.0.3 area 1
+ network 10.0.0.8 0.0.0.3 area 1
+ network 10.1.1.1 0.0.0.0 area 1
+!
 
 *********** R1 ***********
 *********** R2 ***********
@@ -21,12 +29,19 @@ interface Loopback0
 !
 interface GigabitEthernet0/0
  ip address 10.0.0.5 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/1
  ip address 10.0.0.13 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
+router ospf 1
+ network 10.0.0.4 0.0.0.3 area 1
+ network 10.0.0.12 0.0.0.3 area 1
+ network 10.2.2.2 0.0.0.0 area 1
+!
 *********** R2 ***********
 *********** R3 ***********
 hostname R3
@@ -36,15 +51,33 @@ interface Loopback0
 !
 interface GigabitEthernet0/0
  ip address 10.0.0.10 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/1
  ip address 10.0.0.17 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/2
  ip address 188.24.0.1 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
+
+router ospf 1
+ area 1 filter-list prefix pl-PUBLIC-FILTER in
+ area 1 filter-list prefix pl-PUBLIC-FILTER out
+ area 0 filter-list prefix pl-PUBLIC-FILTER in
+ area 0 filter-list prefix pl-PUBLIC-FILTER out
+ network 10.0.0.16 0.0.0.3 area 0
+ network 10.3.3.3 0.0.0.0 area 0
+ network 10.0.0.8 0.0.0.3 area 1
+!
+
+ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
 
 *********** R3 ***********
 *********** R4 ***********
@@ -55,15 +88,33 @@ interface Loopback0
 !
 interface GigabitEthernet0/0
  ip address 10.0.0.14 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/1
  ip address 10.0.0.18 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/2
  ip address 13.201.255.5 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
+
+router ospf 1
+ area 1 filter-list prefix pl-PUBLIC-FILTER in
+ area 1 filter-list prefix pl-PUBLIC-FILTER out
+ area 0 filter-list prefix pl-PUBLIC-FILTER in
+ area 0 filter-list prefix pl-PUBLIC-FILTER out
+ network 10.0.0.16 0.0.0.3 area 0
+ network 10.4.4.4 0.0.0.0 area 0
+ network 10.0.0.12 0.0.0.3 area 1
+!
+
+ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
 
 *********** R4 ***********
 *********** R5 ***********
@@ -74,12 +125,19 @@ interface Loopback0
 !
 interface GigabitEthernet0/0
  ip address 10.0.0.2 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/1
  ip address 10.0.0.6 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
+router ospf 1
+ network 10.0.0.0 0.0.0.3 area 1
+ network 10.0.0.4 0.0.0.3 area 1
+ network 10.5.5.5 0.0.0.0 area 1
+!
 *********** R5 ***********
 *********** R6 ***********
 hostname R6
@@ -93,11 +151,26 @@ interface GigabitEthernet0/0
 
 interface GigabitEthernet0/1
  ip address 172.16.0.1 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/2
  ip address 172.16.0.5 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
+
+router ospf 1
+ area 0 filter-list prefix pl-PUBLIC-FILTER in
+ area 0 filter-list prefix pl-PUBLIC-FILTER out
+ network 172.16.0.0 0.0.0.3 area 0
+ network 172.16.0.4 0.0.0.3 area 0
+ network 10.6.6.6 0.0.0.0 area 0
+!
+
+ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
 
 *********** R6 ***********
 *********** R7 ***********
@@ -112,11 +185,26 @@ interface GigabitEthernet0/0
 
 interface GigabitEthernet0/1
  ip address 172.16.0.2 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/2
  ip address 172.16.0.9 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
+
+router ospf 1
+ area 0 filter-list prefix pl-PUBLIC-FILTER in
+ area 0 filter-list prefix pl-PUBLIC-FILTER out
+ network 172.16.0.0 0.0.0.3 area 0
+ network 172.16.0.8 0.0.0.3 area 0
+ network 10.7.7.7 0.0.0.0 area 0
+!
+
+ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
+ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
 
 *********** R7 ***********
 *********** R8 ***********
@@ -128,10 +216,17 @@ interface Loopback0
 
 interface GigabitEthernet0/0
  ip address 172.16.0.6 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
 interface GigabitEthernet0/1
  ip address 172.16.0.10 255.255.255.252
+ ip ospf network point-to-point
  no shutdown
 
+router ospf 1
+ network 172.16.0.4 0.0.0.3 area 0
+ network 172.16.0.8 0.0.0.3 area 0
+ network 10.8.8.8 0.0.0.0 area 0
+!
 *********** R8 ***********
