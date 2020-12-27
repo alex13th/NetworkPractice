@@ -1,0 +1,76 @@
+*********** R3 ***********
+router bgp 300
+ neighbor 10.0.0.18 remote-as 300
+ neighbor 10.0.0.18 next-hop-self
+ network 188.24.0.0 mask 255.255.255.252
+ neighbor 188.24.0.2 route-map rm-BGP out
+ redistribute ospf 1
+!
+
+
+ip prefix-list pl-BGP-ALLOWING-SUBNETS seq 5 permit 10.0.0.0/8 ge 30
+
+route-map rm-BGP permit 100
+ match ip address prefix-list pl-BGP-ALLOWING-SUBNETS
+ set origin igp
+!
+route-map rm-BGP deny 200
+
+*********** R3 ***********
+*********** R4 ***********
+router bgp 300
+ redistribute ospf 1
+ neighbor 10.0.0.17 remote-as 300
+ neighbor 10.0.0.17 next-hop-self
+ neighbor 10.0.0.17 weight 32768
+ neighbor 13.201.255.6 route-map rm-BGP out
+ network 13.201.255.4 mask 255.255.255.252
+!
+
+ip prefix-list pl-BGP-ALLOWING-SUBNETS seq 5 permit 10.0.0.0/8 ge 30
+
+route-map rm-BGP permit 100
+ match ip address prefix-list pl-BGP-ALLOWING-SUBNETS
+ set origin igp
+!
+route-map rm-BGP deny 200
+
+*********** R4 ***********
+
+*********** R6 ***********
+router bgp 700
+ redistribute ospf 1
+ neighbor 172.16.0.2 remote-as 700
+ neighbor 172.16.0.2 next-hop-self
+ neighbor 172.16.0.2 weight 32768
+ neighbor 188.24.0.2 route-map rm-BGP out
+ network 188.24.0.0 mask 255.255.255.252
+!
+
+ip prefix-list pl-BGP-ALLOWING-SUBNETS seq 5 permit 172.16.0.0/12 ge 30
+
+route-map rm-BGP permit 100
+ match ip address prefix-list pl-BGP-ALLOWING-SUBNETS
+ set origin igp
+!
+route-map rm-BGP deny 200
+
+*********** R6 ***********
+*********** R7 ***********
+router bgp 700
+ redistribute ospf 1
+ neighbor 172.16.0.1 remote-as 700
+ neighbor 172.16.0.1 next-hop-self
+ neighbor 13.201.255.5 route-map rm-BGP out
+ network 13.201.255.4 mask 255.255.255.252
+!
+
+ip prefix-list pl-BGP-ALLOWING-SUBNETS seq 5 permit 172.16.0.0/12 ge 30
+
+route-map rm-BGP permit 100
+ match ip address prefix-list pl-BGP-ALLOWING-SUBNETS
+ set origin igp
+!
+route-map rm-BGP deny 200
+
+*********** R7 ***********
