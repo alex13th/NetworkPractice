@@ -8,18 +8,24 @@ interface GigabitEthernet0/0
  ip address 10.0.0.1 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/1
  ip address 10.0.0.9 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
  network 10.0.0.0 0.0.0.3 area 1
  network 10.0.0.8 0.0.0.3 area 1
  network 10.1.1.1 0.0.0.0 area 1
 !
+router bgp 300
+ neighbor 10.3.3.3 remote-as 300
+ neighbor 10.3.3.3 update-source Loopback0
 
+ neighbor 10.4.4.4 remote-as 300
+ neighbor 10.4.4.4 update-source Loopback0
+!
 *********** R1 ***********
 *********** R2 ***********
 hostname R2
@@ -31,18 +37,27 @@ interface GigabitEthernet0/0
  ip address 10.0.0.5 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/1
  ip address 10.0.0.13 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
  network 10.0.0.4 0.0.0.3 area 1
  network 10.0.0.12 0.0.0.3 area 1
  network 10.2.2.2 0.0.0.0 area 1
 !
+router bgp 300
+ neighbor 10.3.3.3 remote-as 300
+ neighbor 10.3.3.3 update-source Loopback0
+
+ neighbor 10.4.4.4 remote-as 300
+ neighbor 10.4.4.4 update-source Loopback0
+!
 *********** R2 ***********
+
+
 *********** R3 ***********
 hostname R3
 
@@ -58,38 +73,51 @@ interface GigabitEthernet0/1
  ip address 10.0.0.17 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/2
  ip address 188.24.0.1 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
  area 1 filter-list prefix pl-AREA1-IN in
- area 1 filter-list prefix pl-PUBLIC-FILTER out
- area 0 filter-list prefix pl-PUBLIC-FILTER in
- area 0 filter-list prefix pl-PUBLIC-FILTER out
  network 10.0.0.16 0.0.0.3 area 0
  network 10.3.3.3 0.0.0.0 area 0
  network 10.0.0.8 0.0.0.3 area 1
 !
 router bgp 300
- bgp log-neighbor-changes
+ network 188.24.0.0 mask 255.255.255.252
+ redistribute ospf 1
+ neighbor 10.0.0.18 remote-as 300
+ neighbor 10.0.0.18 next-hop-self
+ neighbor 10.1.1.1 remote-as 300
+ neighbor 10.1.1.1 route-reflector-client 
+ neighbor 10.2.2.2 remote-as 300
+ neighbor 10.2.2.2 route-reflector-client 
+ neighbor 10.5.5.5 remote-as 300
+ neighbor 10.5.5.5 route-reflector-client 
  neighbor 188.24.0.2 remote-as 700
-!
+ neighbor 188.24.0.2 route-map rm_BGP-OUT out
 
 ip prefix-list pl-AREA1-IN seq 5 deny 10.3.3.3/32
-ip prefix-list pl-AREA1-IN seq 5 permit 10.0.0.0/8 le 32
-ip prefix-list pl-AREA1-IN seq 10 permit 172.16.0.0/12 le 32
-ip prefix-list pl-AREA1-IN seq 15 permit 192.168.0.0/16 le 32
-ip prefix-list pl-AREA1-IN seq 20 deny 0.0.0.0/0 le 32
+ip prefix-list pl-AREA1-IN seq 10 permit 0.0.0.0/0 le 32
 
-ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
-
+!
+ip prefix-list pl_BGP-OUT-FILTER seq 5 permit 10.0.0.0/8 le 30
+ip prefix-list pl_BGP-OUT-FILTER seq 10 permit 10.1.1.1/32
+ip prefix-list pl_BGP-OUT-FILTER seq 15 permit 10.2.2.2/32
+ip prefix-list pl_BGP-OUT-FILTER seq 20 permit 10.3.3.3/32
+ip prefix-list pl_BGP-OUT-FILTER seq 25 permit 10.4.4.4/32
+ip prefix-list pl_BGP-OUT-FILTER seq 30 permit 10.5.5.5/32
+!
+route-map rm_BGP-OUT permit 10
+ match ip address prefix-list pl_BGP-OUT-FILTER
+ set origin igp
+!
+route-map rm_BGP-OUT deny 20
 *********** R3 ***********
+
+
 *********** R4 ***********
 hostname R4
 
@@ -112,25 +140,41 @@ interface GigabitEthernet0/2
  no shutdown
 
 router ospf 1
- area 1 filter-list prefix pl-PUBLIC-FILTER in
- area 1 filter-list prefix pl-PUBLIC-FILTER out
- area 0 filter-list prefix pl-PUBLIC-FILTER in
- area 0 filter-list prefix pl-PUBLIC-FILTER out
  network 10.0.0.16 0.0.0.3 area 0
  network 10.4.4.4 0.0.0.0 area 0
  network 10.0.0.12 0.0.0.3 area 1
 !
 router bgp 300
- bgp log-neighbor-changes
+ network 13.201.255.4 mask 255.255.255.252
+ redistribute ospf 1
+ neighbor 10.0.0.17 remote-as 300
+ neighbor 10.0.0.17 next-hop-self
+ neighbor 10.1.1.1 remote-as 300
+ neighbor 10.1.1.1 route-reflector-client 
+ neighbor 10.2.2.2 remote-as 300
+ neighbor 10.2.2.2 route-reflector-client 
+ neighbor 10.5.5.5 remote-as 300
+ neighbor 10.5.5.5 route-reflector-client 
  neighbor 13.201.255.6 remote-as 700
+ neighbor 13.201.255.6 route-map rm_BGP-OUT out
 !
-
-ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
+ip prefix-list pl_BGP-OUT-FILTER seq 5 permit 10.0.0.0/8 le 30
+ip prefix-list pl_BGP-OUT-FILTER seq 10 permit 10.1.1.1/32
+ip prefix-list pl_BGP-OUT-FILTER seq 15 permit 10.2.2.2/32
+ip prefix-list pl_BGP-OUT-FILTER seq 20 permit 10.3.3.3/32
+ip prefix-list pl_BGP-OUT-FILTER seq 25 permit 10.4.4.4/32
+ip prefix-list pl_BGP-OUT-FILTER seq 30 permit 10.5.5.5/32
+!
+route-map rm_BGP-OUT permit 10
+ match ip address prefix-list pl_BGP-OUT-FILTER
+ set origin igp
+!
+route-map rm_BGP-OUT deny 20
 
 *********** R4 ***********
+
+
+
 *********** R5 ***********
 hostname R5
 
@@ -141,12 +185,12 @@ interface GigabitEthernet0/0
  ip address 10.0.0.2 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/1
  ip address 10.0.0.6 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
  network 10.0.0.0 0.0.0.3 area 1
  network 10.0.0.4 0.0.0.3 area 1
@@ -162,34 +206,61 @@ interface Loopback0
 interface GigabitEthernet0/0
  ip address 188.24.0.2 255.255.255.252
  no shutdown
-
+!
 interface GigabitEthernet0/1
  ip address 172.16.0.1 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/2
  ip address 172.16.0.5 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
- area 0 filter-list prefix pl-PUBLIC-FILTER in
- area 0 filter-list prefix pl-PUBLIC-FILTER out
+ redistribute bgp 700 subnets route-map rm_BGP-TO-OSPF
  network 172.16.0.0 0.0.0.3 area 0
  network 172.16.0.4 0.0.0.3 area 0
  network 10.6.6.6 0.0.0.0 area 0
 !
 router bgp 700
- bgp log-neighbor-changes
+ bgp redistribute-internal
+ network 188.24.0.0 mask 255.255.255.252
+ redistribute ospf 1 match internal external 1 external 2 route-map rm_OSPF-TO-BGP
+ neighbor 172.16.0.2 remote-as 700
+ neighbor 172.16.0.2 next-hop-self
  neighbor 188.24.0.1 remote-as 300
+ neighbor 188.24.0.1 route-map rm_BGP-OUT out
 !
-ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
+ip prefix-list pl_BGP-OUT-FILTER seq 5 permit 172.16.0.0/12 le 30
+ip prefix-list pl_BGP-OUT-FILTER seq 10 permit 10.6.6.6/32
+ip prefix-list pl_BGP-OUT-FILTER seq 15 permit 10.7.7.7/32
+ip prefix-list pl_BGP-OUT-FILTER seq 20 permit 10.8.8.8/32
+!
+
+ip community-list 70 permit 700
+
+route-map rm_OSPF-TO-BGP deny 10
+ match tag 300
+!
+route-map rm_OSPF-TO-BGP permit 20
+ set community 700
+!
+route-map rm_BGP-TO-OSPF deny 10
+ match community 70
+!
+route-map rm_BGP-TO-OSPF permit 20
+ set tag 300
+!
+route-map rm_BGP-OUT permit 10
+ match ip address prefix-list pl_BGP-OUT-FILTER
+ set origin igp
+!         
+route-map rm_BGP-OUT deny 20
 
 *********** R6 ***********
+
+
 *********** R7 ***********
 hostname R7
 
@@ -199,33 +270,57 @@ interface Loopback0
 interface GigabitEthernet0/0
  ip address 13.201.255.6 255.255.255.252
  no shutdown
-
+!
 interface GigabitEthernet0/1
  ip address 172.16.0.2 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/2
  ip address 172.16.0.9 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
- area 0 filter-list prefix pl-PUBLIC-FILTER in
- area 0 filter-list prefix pl-PUBLIC-FILTER out
+ redistribute bgp 700 subnets route-map rm_BGP-TO-OSPF
  network 172.16.0.0 0.0.0.3 area 0
  network 172.16.0.8 0.0.0.3 area 0
  network 10.7.7.7 0.0.0.0 area 0
 !
 router bgp 700
- bgp log-neighbor-changes
+ bgp redistribute-internal
+ network 13.201.255.4 mask 255.255.255.252
+ redistribute ospf 1 match internal external 1 external 2 route-map rm_OSPF-TO-BGP
+ neighbor 172.16.0.1 remote-as 700
+ neighbor 172.16.0.1 next-hop-self
  neighbor 13.201.255.5 remote-as 300
+ neighbor 13.201.255.5 route-map rm_BGP-OUT out
 !
 
-ip prefix-list pl-PUBLIC-FILTER seq 5 permit 10.0.0.0/8 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 10 permit 172.16.0.0/12 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 15 permit 192.168.0.0/16 le 32
-ip prefix-list pl-PUBLIC-FILTER seq 20 deny 0.0.0.0/0 le 32
+ip community-list 70 permit 700
+
+ip prefix-list pl_BGP-OUT-FILTER seq 5 permit 172.168.0.0/12 le 30
+ip prefix-list pl_BGP-OUT-FILTER seq 10 permit 10.6.6.6/32
+ip prefix-list pl_BGP-OUT-FILTER seq 15 permit 10.7.7.7/32
+ip prefix-list pl_BGP-OUT-FILTER seq 20 permit 10.8.8.8/32
+!
+route-map rm_OSPF-TO-BGP deny 10
+ match tag 300
+!
+route-map rm_OSPF-TO-BGP permit 20
+ set community 700
+!
+route-map rm_BGP-TO-OSPF deny 10
+ match community 70
+!
+route-map rm_BGP-TO-OSPF permit 20
+ set tag 300
+!
+route-map rm_BGP-OUT permit 10
+ match ip address prefix-list pl_BGP-OUT-FILTER
+ set origin igp
+!         
+route-map rm_BGP-OUT deny 20
 
 *********** R7 ***********
 *********** R8 ***********
@@ -234,17 +329,16 @@ hostname R8
 interface Loopback0
  ip address 10.8.8.8 255.255.255.255
 !
-
 interface GigabitEthernet0/0
  ip address 172.16.0.6 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 interface GigabitEthernet0/1
  ip address 172.16.0.10 255.255.255.252
  ip ospf network point-to-point
  no shutdown
-
+!
 router ospf 1
  network 172.16.0.4 0.0.0.3 area 0
  network 172.16.0.8 0.0.0.3 area 0
@@ -263,6 +357,7 @@ router ospf 1
 
 
 
+ed to mark a set of
 
 
 
@@ -270,18 +365,7 @@ router ospf 1
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+ed to mark a set of
 
 
 
