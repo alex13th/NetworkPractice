@@ -91,14 +91,15 @@ router bgp 300
  neighbor 10.0.0.18 remote-as 300
  neighbor 10.0.0.18 next-hop-self
  neighbor 10.1.1.1 remote-as 300
- neighbor 10.1.1.1 route-reflector-client 
+ neighbor 10.1.1.1 route-reflector-client
  neighbor 10.2.2.2 remote-as 300
- neighbor 10.2.2.2 route-reflector-client 
+ neighbor 10.2.2.2 route-reflector-client
  neighbor 10.5.5.5 remote-as 300
- neighbor 10.5.5.5 route-reflector-client 
+ neighbor 10.5.5.5 route-reflector-client
  neighbor 188.24.0.2 remote-as 700
+ neighbor 188.24.0.2 weight 60000
  neighbor 188.24.0.2 route-map rm_BGP-OUT out
-
+!
 ip prefix-list pl-AREA1-IN seq 5 deny 10.3.3.3/32
 ip prefix-list pl-AREA1-IN seq 10 permit 0.0.0.0/0 le 32
 
@@ -149,15 +150,18 @@ router bgp 300
  redistribute ospf 1
  neighbor 10.0.0.17 remote-as 300
  neighbor 10.0.0.17 next-hop-self
+ neighbor 10.0.0.17 weight 48000
  neighbor 10.1.1.1 remote-as 300
- neighbor 10.1.1.1 route-reflector-client 
+ neighbor 10.1.1.1 route-reflector-client
  neighbor 10.2.2.2 remote-as 300
- neighbor 10.2.2.2 route-reflector-client 
+ neighbor 10.2.2.2 route-reflector-client
  neighbor 10.5.5.5 remote-as 300
- neighbor 10.5.5.5 route-reflector-client 
+ neighbor 10.5.5.5 route-reflector-client
  neighbor 13.201.255.6 remote-as 700
+ neighbor 13.201.255.6 weight 30000
  neighbor 13.201.255.6 route-map rm_BGP-OUT out
 !
+
 ip prefix-list pl_BGP-OUT-FILTER seq 5 permit 10.0.0.0/8 le 30
 ip prefix-list pl_BGP-OUT-FILTER seq 10 permit 10.1.1.1/32
 ip prefix-list pl_BGP-OUT-FILTER seq 15 permit 10.2.2.2/32
@@ -196,7 +200,16 @@ router ospf 1
  network 10.0.0.4 0.0.0.3 area 1
  network 10.5.5.5 0.0.0.0 area 1
 !
+router bgp 300
+ neighbor 10.3.3.3 remote-as 300
+ neighbor 10.3.3.3 update-source Loopback0
+
+ neighbor 10.4.4.4 remote-as 300
+ neighbor 10.4.4.4 update-source Loopback0
+!
 *********** R5 ***********
+
+
 *********** R6 ***********
 hostname R6
 
@@ -229,7 +242,10 @@ router bgp 700
  redistribute ospf 1 match internal external 1 external 2 route-map rm_OSPF-TO-BGP
  neighbor 172.16.0.2 remote-as 700
  neighbor 172.16.0.2 next-hop-self
+ neighbor 172.16.0.2 send-community
+ neighbor 172.16.0.2 weight 48000
  neighbor 188.24.0.1 remote-as 300
+ neighbor 188.24.0.1 weight 30000
  neighbor 188.24.0.1 route-map rm_BGP-OUT out
 !
 ip prefix-list pl_BGP-OUT-FILTER seq 5 permit 172.16.0.0/12 le 30
@@ -291,11 +307,14 @@ router bgp 700
  bgp redistribute-internal
  network 13.201.255.4 mask 255.255.255.252
  redistribute ospf 1 match internal external 1 external 2 route-map rm_OSPF-TO-BGP
+ neighbor 13.201.255.5 remote-as 300
+ neighbor 13.201.255.5 weight 48000
+ neighbor 13.201.255.5 route-map rm_BGP-OUT out
  neighbor 172.16.0.1 remote-as 700
  neighbor 172.16.0.1 next-hop-self
- neighbor 13.201.255.5 remote-as 300
- neighbor 13.201.255.5 route-map rm_BGP-OUT out
+ neighbor 172.16.0.1 weight 30000
 !
+
 
 ip community-list 70 permit 700
 
@@ -343,97 +362,5 @@ router ospf 1
  network 172.16.0.4 0.0.0.3 area 0
  network 172.16.0.8 0.0.0.3 area 0
  network 10.8.8.8 0.0.0.0 area 0
-!
-*********** R8 ***********
-
-
-
-
-
-
-
-
-
-
-
-
-ed to mark a set of
-
-
-
-
-
-
-
-ed to mark a set of
-
-
-
-
-
-
-
-
-
-
-
-*********** R1 ***********
-router bgp 300
- neighbor 10.3.3.3 remote-as 300
- neighbor 10.3.3.3 update-source Loopback0
-!
-*********** R1 ***********
-
-*********** R2 ***********
-router bgp 300
- neighbor 10.3.3.3 remote-as 300
- neighbor 10.3.3.3 update-source Loopback0
-!
-*********** R2 ***********
-
-*********** R3 ***********
-router bgp 300
- neighbor 10.1.1.1 remote-as 300
- neighbor 10.1.1.1 update-source Loopback0
- neighbor 10.1.1.1 route-reflector-client
-
- neighbor 10.2.2.2 remote-as 300
- neighbor 10.2.2.2 update-source Loopback0
- neighbor 10.2.2.2 route-reflector-client
-
- neighbor 10.5.5.5 remote-as 300
- neighbor 10.5.5.5 update-source Loopback0
- neighbor 10.5.5.5 route-reflector-client
-!
-*********** R3 ***********
-
-*********** R4 ***********
-*********** R4 ***********
-
-*********** R5 ***********
-router bgp 300
- neighbor 10.3.3.3 remote-as 300
- neighbor 10.3.3.3 update-source Loopback0
-!
-*********** R5 ***********
-
-*********** R6 ***********
-router bgp 300
- neighbor 10.3.3.3 remote-as 300
- neighbor 10.3.3.3 update-source Loopback0
-!
-*********** R6 ***********
-
-*********** R7 ***********
-router bgp 300
- neighbor 10.3.3.3 remote-as 300
- neighbor 10.3.3.3 update-source Loopback0
-!
-*********** R7 ***********
-
-*********** R8 ***********
-router bgp 300
- neighbor 10.3.3.3 remote-as 300
- neighbor 10.3.3.3 update-source Loopback0
 !
 *********** R8 ***********
